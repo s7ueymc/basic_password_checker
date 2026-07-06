@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Strength Checker</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, Arial, sans-serif;
+        background: linear-gradient(135deg, #f5f7ff 0%, #eef4ff 100%);
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 520px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+        padding: 30px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 1.7rem;
+        color: #111827;
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: #4b5563;
+        line-height: 1.5;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      input[type="password"] {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+
+      button {
+        margin-top: 12px;
+        width: 100%;
+        padding: 12px 14px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button:hover {
+        opacity: 0.95;
+      }
+
+      .result {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 12px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        line-height: 1.6;
+      }
+
+      .result p {
+        margin: 0 0 8px;
+      }
+
+      .meter-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 6px 0;
+      }
+
+      .meter-label {
+        width: 120px;
+        font-size: 0.95rem;
+        color: #374151;
+      }
+
+      .meter-track {
+        flex: 1;
+        height: 10px;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .meter-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .meter-value {
+        min-width: 28px;
+        text-align: right;
+        font-size: 0.9rem;
+        color: #4b5563;
+      }
+
+      .strong {
+        color: #047857;
+        font-weight: 600;
+      }
+
+      .moderate {
+        color: #b45309;
+        font-weight: 600;
+      }
+
+      .weak {
+        color: #b91c1c;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Password Strength Checker</h1>
+      <p>Enter a password to see how strong it is.</p>
+
+      <div class="input-group">
+        <input id="passwordInput" type="password" placeholder="Enter password" />
+        <button id="checkButton">Check Password</button>
+      </div>
+
+      <div id="result" class="result">
+        <p>Your results will appear here.</p>
+      </div>
+    </div>
+
+    <script>
+      const commonPasswords = new Set([
+        '123456', '12345', '123456789', 'password', 'iloveyou', 'princess', '1234567', 'rockyou', '12345678', 'abc123',
+        'nicole', 'daniel', 'babygirl', 'monkey', 'lovely', 'jessica', '654321', 'michael', 'ashley', 'qwerty', '111111',
+        'iloveu', '000000', 'michelle', 'tigger', 'sunshine', 'chocolate', '6987', '69866986', '698532', '698496', '6984406',
+        '69796979', '69756975', '697369', '6973202', '697100', '6969loves', '6969gi', '69699696', '696978', '69696k', '69696a',
+        '696969mc', '696969g', '696969e', '696917', '69691234', '696910', '696908', '696907', '696905', '6969007', 'noodles6',
+        'noodles52', 'noodles4u', 'noodles456', 'noodles44', 'noodles32', 'noodles20', 'noodles16', 'noodles0701', 'noodles06',
+        'noodles05', 'noodles04', 'noodleroni', 'noodlepop', 'noodlepoodle', 'noodlegirl', 'noodlefiend', 'noodlebug1', 'noodlebug',
+        'noodleboy', 'noodlebooger', 'noodle95', 'noodle92', 'noodle91', 'noodle86', 'noodle83', 'concrete', 'conchis', 'conchi',
+        'concheros', 'conception', 'concept', 'conan3', 'conan1', 'conall', 'comunismo', 'computer22', 'computer16', 'computer0',
+        'compusa', 'compu1', 'compton5', 'complex', 'compidisco', 'compaqmv520', 'compaq79', 'compaq7', 'compaq65', 'compaq123',
+        'compaq12', 'compaq11', 'compaq00', 'virginio94', 'virgininha', 'virginil', 'virginija', 'virginies', 'virginieooq',
+        'virginielove', 'virginie81', 'virginie8', 'virginie79', 'virginie26', 'virginie21jan85', 'virginie1962', 'virginie13..', 'virginie1'
+      ]);
+
+      async function loadCommonPasswords() {
+        try {
+          const response = await fetch('commonPassword.txt');
+          if (!response.ok) throw new Error('Could not load list');
+          const text = await response.text();
+          text.split(/\r?\n/).forEach((line) => {
+            const value = line.trim().toLowerCase();
+            if (value) commonPasswords.add(value);
+          });
+        } catch (error) {
+          console.warn('Using built-in password list instead of file.', error);
+        }
+      }
+
+      function checkPassword(password) {
+        if (!password) {
+          return {
+            message: 'Please enter a password.',
+            score: 0,
+            maxScore: 6,
+            breakdown: []
+          };
+        }
+
+        if (commonPasswords.has(password.toLowerCase())) {
+          return {
+            message: 'Password is in common list.\nPassword strength: Very weak.',
+            score: 0,
+            maxScore: 6,
+            breakdown: []
+          };
+        }
+
+        const length = password.length;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasDigit = /\d/.test(password);
+        const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+        let score = 0;
+        if (length >= 8) score += 1;
+        if (length >= 12) score += 1;
+        if (hasUpper) score += 1;
+        if (hasLower) score += 1;
+        if (hasDigit) score += 1;
+        if (hasSpecial) score += 1;
+
+        let strengthText = '';
+        if (score < 2) {
+          strengthText = 'Weak';
+        } else if (score < 5) {
+          strengthText = 'Moderate';
+        } else {
+          strengthText = 'Strong';
+        }
+
+        return {
+          message: `Strength: ${strengthText}`,
+          score,
+          maxScore: 6,
+          breakdown: [
+            { label: 'Length', value: length >= 12 ? 2 : length >= 8 ? 1 : 0, max: 2 },
+            { label: 'Uppercase', value: hasUpper ? 1 : 0, max: 1 },
+            { label: 'Lowercase', value: hasLower ? 1 : 0, max: 1 },
+            { label: 'Digit', value: hasDigit ? 1 : 0, max: 1 },
+            { label: 'Special', value: hasSpecial ? 1 : 0, max: 1 }
+          ]
+        };
+      }
+
+      function updateResult(result) {
+        const resultBox = document.getElementById('result');
+        resultBox.innerHTML = '';
+        resultBox.className = 'result';
+
+        if (result.message) {
+          const message = document.createElement('p');
+          message.textContent = result.message;
+          resultBox.appendChild(message);
+        }
+
+        if (result.breakdown && result.breakdown.length > 0) {
+          result.breakdown.forEach((item) => {
+            const row = document.createElement('div');
+            row.className = 'meter-row';
+
+            const label = document.createElement('div');
+            label.className = 'meter-label';
+            label.textContent = item.label;
+
+            const track = document.createElement('div');
+            track.className = 'meter-track';
+
+            const fill = document.createElement('div');
+            fill.className = 'meter-fill';
+            const percent = (item.value / item.max) * 100;
+            fill.style.width = `${percent}%`;
+            track.appendChild(fill);
+
+            const value = document.createElement('div');
+            value.className = 'meter-value';
+            value.textContent = item.value;
+
+            row.appendChild(label);
+            row.appendChild(track);
+            row.appendChild(value);
+            resultBox.appendChild(row);
+          });
+        }
+
+        if (result.score !== undefined) {
+          const totalRow = document.createElement('div');
+          totalRow.className = 'meter-row';
+
+          const totalLabel = document.createElement('div');
+          totalLabel.className = 'meter-label';
+          totalLabel.textContent = 'Overall Score';
+
+          const totalTrack = document.createElement('div');
+          totalTrack.className = 'meter-track';
+
+          const totalFill = document.createElement('div');
+          totalFill.className = 'meter-fill';
+          totalFill.style.width = `${(result.score / result.maxScore) * 100}%`;
+          totalTrack.appendChild(totalFill);
+
+          const totalValue = document.createElement('div');
+          totalValue.className = 'meter-value';
+          totalValue.textContent = `${result.score}/${result.maxScore}`;
+
+          totalRow.appendChild(totalLabel);
+          totalRow.appendChild(totalTrack);
+          totalRow.appendChild(totalValue);
+          resultBox.appendChild(totalRow);
+        }
+
+        if (result.message && result.message.includes('Weak')) {
+          resultBox.classList.add('weak');
+        } else if (result.message && result.message.includes('Moderate')) {
+          resultBox.classList.add('moderate');
+        } else if (result.message && result.message.includes('Strong')) {
+          resultBox.classList.add('strong');
+        }
+      }
+
+      document.getElementById('checkButton').addEventListener('click', async () => {
+        const password = document.getElementById('passwordInput').value;
+        await loadCommonPasswords();
+        updateResult(checkPassword(password));
+      });
+
+      document.getElementById('passwordInput').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          document.getElementById('checkButton').click();
+        }
+      });
+    </script>
+  </body>
+</html>
