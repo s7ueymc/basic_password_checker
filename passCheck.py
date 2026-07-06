@@ -1,4 +1,18 @@
-def checkPassword(password):
+import os
+
+def loadCommonPasswords(filename="commonPassword.txt"):
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    fullPath = os.path.join(scriptDir, filename)
+    with open(fullPath, "r") as file:
+        return set(line.strip().lower() for line in file)
+    
+def checkPassword(password, commonPasswords):
+
+    if password.lower() in commonPasswords:
+        print("Password is too common.")
+        print("Password strength: Very weak.")
+        return
+
     length = len(password)
     hasUpper = any(c.isupper() for c in password)
     hasLower = any(c.islower() for c in password)
@@ -34,4 +48,8 @@ def checkPassword(password):
     else:
         print("Password is strong.")
 
-checkPassword(input("Enter password: "))
+
+commonList = loadCommonPasswords()
+checkPassword(input("Enter password: "), commonList)
+
+
