@@ -11,4 +11,27 @@ def checkPassword(password):
     print("Has digit:", hasDigit)
     print("Has special character:", hasSpecial)
 
+    score = 0
+    if length >= 8:
+        score += 1
+    if length >= 12:
+        score += 1
+    if hasUpper:
+        score += 1
+    if hasLower:
+        score += 1
+    if hasDigit:
+        score += 1
+    if hasSpecial:
+        score += 1
+    
+    print("Password strength score:", score, "/6")
+
+    if score < 2:
+        print("Password is weak.")
+    elif score < 5:
+        print("Password is moderate.")
+    else:
+        print("Password is strong.")
+
 checkPassword(input("Enter password: "))
