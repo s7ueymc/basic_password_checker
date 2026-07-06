@@ -1,6 +1,6 @@
 import os
 
-# Load the list of common passwords from a text file in the same folder as this script.
+# Load the list of common passwords 
 def loadCommonPasswords(filename="commonPassword.txt"):
     scriptDir = os.path.dirname(os.path.abspath(__file__))
     fullPath = os.path.join(scriptDir, filename)
